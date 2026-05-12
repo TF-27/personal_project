@@ -2,6 +2,12 @@ import numpy
 import math
 from calculate_variables import get_Asvm, calculate_deviation, calculate_mean_psi_abs
 
+
+## NEW IDEAS:
+# Detection is a call in main(). Calls get_gyro() and get_acc() every 1/100 s (2/200 right?). Then builds an instance of a class 'fall', which then starts collecting the 199 samples after that and storing it. 
+# That class can then have properties like which phases were checked as well-> export to store on hd for analyses.
+# Finally the class will have an alert status set to false/true. At check 6 if it's true -> raise alarm.
+
 def detect_fall():
 
     if phase_one(accelerometer_data):
