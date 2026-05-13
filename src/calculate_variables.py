@@ -6,12 +6,12 @@ def calculate_Asvm(x, y, z):
     ax = x / 0.00980665
     ay = y / 0.00980665
     az = z / 0.00980665
-    return math.root(ax**2 + ay**2 + az**2)
+    return math.sqrt(ax**2 + ay**2 + az**2)
 
 def calculate_Gsvm(x, y, z):
     # modification of x,y,z if needed
 
-    return math.root(gx**2 + gy**2 + gz**2)
+    return math.sqrt(gx**2 + gy**2 + gz**2)
 
 
 def calculate_deviation(selected_frame):
@@ -24,10 +24,10 @@ def calculate_deviation(selected_frame):
     
     return deviation
 
-def psi_angle(selected_frame):
+def calculate_mean_psi_abs(selected_frame):
     psirray = []
     for time in selected_frame:
-        psi = numpy.arctan(ay / math.root(z**2 + x**2)) #correct so x,y,z are elements of time
+        psi = numpy.arctan(ay / math.sqrt(z**2 + x**2)) #correct so x,y,z are elements of time
         psirray.append(psi)
     mean_psi = numpy.sum(psirray) / len(selected_frame)
     return numpy.absolute(mean_psi)

@@ -1,6 +1,8 @@
 import numpy
 import math
-from calculate_variables import get_Asvm, calculate_deviation, calculate_mean_psi_abs
+from calculate_variables import calculate_Asvm, calculate_deviation #calculate_mean_psi_abs
+from csv_tests import get_data
+import random
 
 
 ## NEW IDEAS:
@@ -9,49 +11,57 @@ from calculate_variables import get_Asvm, calculate_deviation, calculate_mean_ps
 # Finally the class will have an alert status set to false/true. At check 6 if it's true -> raise alarm.
 
 def detect_fall():
-
-    if phase_one(accelerometer_data):
+    accelerometer_data = get_data("acc")
+    if phase_one(accelerometer_data, None, random.randrange(0,1652)):
         return True
     return False # I considered removing this True/False feedback loop, but I think it might be good to keep it. To log and detect false positives/negatives. SO IMPLEMENT A "FALSE-LOG" IN MAIN!
 
 # may have to redesign depending on how continuous data is fed. For example, could only return true/fals for phase one and then generate a dataset of 200 points to feed to phase 2 etc. Good way to also log the frames in alert and no alert
 
 def phase_one(accelerometer_cont, gyro_cont, time):
-    # data -> x/y/z
-    
-    if get_Asvm(x,y,z) < 800:     # Set limit as var? (i.e. create a dictionary)
+    Axv = accelerometer_cont.Ax[time]
+    Ayv = accelerometer_cont.Ay[time]
+    Azv = accelerometer_cont.Az[time]
+
+    if calculate_Asvm(Axv, Ayv, Azv) < 800:     # Set limit as var? (i.e. create a dictionary)
+        #print(f"Asvm is {calculate_Asvm(Axv, Ayv, Azv)}")
+        #print(f"\nAxv: {Axv}\nAy: {Ayv}\nAzv: {Azv}\n\naccelerometer_cont: {accelerometer_cont}\n\naccelerometer_cont.Ax[10]: {accelerometer_cont.Ax[10]}")
         acc_frame = {
-            time: #accelerometer_cont[time:time+199],
-            x: # same frames,
-            y: # same frames,
-            z: # same frames,
+            't': accelerometer_cont.t[0:199].tolist(),
+            'x': accelerometer_cont.Ax[0:199].tolist(),
+            'y': accelerometer_cont.Ay[0:199].tolist(),
+            'z': accelerometer_cont.Az[0:199].tolist(),
         }
 
-        gyro_frame = {
-            time: #gyro_cont[time:time+199]
-            x: # same frames,
-            y: # same frames,
-            z: # same frames,
-        }
-
-        if phase_two(acc_frame, gyro_frame): #seriously considering changing this to make detect_fall() call all the phases.
+#        gyro_frame = {
+#            time: #gyro_cont[time:time+199]
+#            x: # same frames,
+#            y: # same frames,
+#            z: # same frames,
+#        }
+        print("\nPhase 1 positive\n")
+        if phase_two(acc_frame, None): #seriously considering changing this to make detect_fall() call all the phases.
             return True
     return False
 
 
 def phase_two(acc_frame, gyro_frame):
-    
-    for datapoint in acc_frame:
-        if get_Asvm(datapoint) > 1400:        # Set limit as var?
-            if phase_three(acc_frame, gyro_frame):
+    Asvm_list = []
+    for coord in range(0,len(acc_frame['t'])):
+        Asvm_list.append(calculate_Asvm(acc_frame['x'][coord], acc_frame['y'][coord], acc_frame['z'][coord]))
+    for asvm in Asvm_list:
+        if asvm > 1400: #NO HITS IN TEST DATA, ADJUST TEST DATA TO HAVE SOME FALLS! (MAY BE THE SAMPLING, SINCE IT'S NOT EVERY 1/100 SECOND)
+            print("Phase 2 positive\n")
+            if phase_three(Asvm_list, gyro_frame):
                 return True
     return False
 
 
-def phase_three(acc_frame, gyro_frame):
-    dev_sample_acc = acc_frame[150:]
+def phase_three(asvm_list, gyro_frame):
+    dev_sample_acc = asvm_list[150:]
 
     if calculate_deviation(dev_sample_acc) < 100: # Set limit as var?
+        print("Phase 3 positive\n")
         if phase_four(gyro_frame):
             return True
     return False
@@ -74,6 +84,7 @@ def phase_five(gyro_frame):
     return False
 
 def phase_6():
+    pass
     #function_to_log gps
     #function_to_alarm_wearer + countdown clock
     #function to alarm emergency contact at clock == 00:00
