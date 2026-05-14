@@ -9,7 +9,9 @@ def calculate_Asvm(x, y, z):
     return math.sqrt(ax**2 + ay**2 + az**2)
 
 def calculate_Gsvm(x, y, z):
-    # modification of x,y,z if needed
+    ax = x * 180 / math.pi
+    ay = y * 180 / math.pi
+    az = z * 180 / math.pi #conversions from rad/s to degrees/s
 
     return math.sqrt(gx**2 + gy**2 + gz**2)
 
@@ -24,10 +26,10 @@ def calculate_deviation(selected_frame):
     
     return deviation
 
-def calculate_mean_psi_abs(selected_frame):
+def calculate_mean_psi_abs(gyro_frame_dictionary):
     psirray = []
-    for time in selected_frame:
-        psi = numpy.arctan(ay / math.sqrt(z**2 + x**2)) #correct so x,y,z are elements of time
+    for time in range(0,len(gyro_frame_dictionary['t'])):
+        psi = numpy.arctan(gyro_frame_dictionary['y'][time] / math.sqrt(gyro_frame_dictionary['z'][time]**2 + gyro_frame_dictionary['x'][time]**2)) #correct so x,y,z are elements of time
         psirray.append(psi)
-    mean_psi = numpy.sum(psirray) / len(selected_frame)
+    mean_psi = numpy.sum(psirray) / len(psirray)
     return numpy.absolute(mean_psi)
