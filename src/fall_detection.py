@@ -4,6 +4,7 @@ from calculate_variables import calculate_Asvm, calculate_deviation, calculate_m
 from csv_tests import get_data
 import random #remove in final code! Is for testing at random only!
 import os
+from variables import Asvm_initial_treshold, Asvm_sample_treshold, Asvm_deviation_upper, Gsvm_deviation_upper, mean_psi_upper
 
 
 ## NEW IDEAS:
@@ -33,7 +34,7 @@ def phase_one(accelerometer_data, gyro_data, time):
     print(f"Azv at time {time}: {Azv}")
 
     print(f"Asvm for {time}: {calculate_Asvm(Axv, Ayv, Azv)}")
-    if calculate_Asvm(Axv, Ayv, Azv) < 800:     # Set limit as var? (i.e. create a dictionary)
+    if calculate_Asvm(Axv, Ayv, Azv) < Asvm_initial_treshold:     # Set limit as var? (i.e. create a dictionary)
         #print(f"Asvm is {calculate_Asvm(Axv, Ayv, Azv)}")
         #print(f"\nAxv: {Axv}\nAy: {Ayv}\nAzv: {Azv}\n\naccelerometer_cont: {accelerometer_cont}\n\naccelerometer_cont.Ax[10]: {accelerometer_cont.Ax[10]}")
         acc_frame = {
@@ -69,8 +70,8 @@ def phase_two(acc_frame, gyro_frame):
         Asvm_list.append(calculate_Asvm(acc_frame['x'][coord], acc_frame['y'][coord], acc_frame['z'][coord]))
     asvm_hit = False
     for asvm in Asvm_list:
-        if asvm > 1400: #NO HITS IN TEST DATA, ADJUST TEST DATA TO HAVE SOME FALLS! (MAY BE THE SAMPLING, SINCE IT'S NOT EVERY 1/100 SECONDs). Current data set goes fully to phase 6 if set to 1039 or lower. should be 1400 in real run
-            print("Phase 2 positive\n")
+        if asvm > Asvm_sample_treshold: #Current data set goes fully to phase 6 if set to 1039 or lower. should be 1400 in real run
+            print("Phase 2 positive")
             print(f"asvm in phase two: {asvm}")
             asvm_hit = True
             break
@@ -83,9 +84,9 @@ def phase_two(acc_frame, gyro_frame):
 def phase_three(asvm_list, gyro_frame):
     dev_sample_acc = asvm_list[150:]
 #    print(f"dev_sample_acc: {dev_sample_acc}")
-    print(f"Asvm deviation: {calculate_deviation(dev_sample_acc)}")
-    if calculate_deviation(dev_sample_acc) < 100: # Set limit as var?
-        print("Phase 3 positive\n")
+    print(f"Asvm deviation: {calculate_deviation(dev_sample_acc)}\n")
+    if calculate_deviation(dev_sample_acc) < Asvm_deviation_upper: # Set limit as var?
+        print("Phase 3 positive")
 
         if phase_four(gyro_frame):
             return True
@@ -98,9 +99,9 @@ def phase_four(gyro_frame):
         gsvm_list.append(calculate_Asvm(gyro_frame['x'][coord], gyro_frame['y'][coord], gyro_frame['z'][coord]))
     
     dev_sample_gyro = gsvm_list[150:]
-    print(f"Gsvm deviation: {calculate_deviation(dev_sample_gyro)}")
-    if calculate_deviation(dev_sample_gyro) < 10: # SET BACK TO ORIGINAL: 10!
-        print("Phase 5 Positive\n")
+    print(f"Gsvm deviation: {calculate_deviation(dev_sample_gyro)}\n")
+    if calculate_deviation(dev_sample_gyro) < Gsvm_deviation_upper: # SET BACK TO ORIGINAL: 10!
+        print("Phase 4 Positive")
         if phase_five(gyro_frame):
             return True
     return False
@@ -114,13 +115,14 @@ def phase_five(gyro_frame):
     }
 #    print(f"gyro_frame: {gyro_frame_psi}")
     print(f"dev_sample_psi: {calculate_mean_psi_abs(gyro_frame_psi)}")
-    if calculate_mean_psi_abs(gyro_frame_psi) < 60:
-        print("Phase 6 positive")
+    if calculate_mean_psi_abs(gyro_frame_psi) < mean_psi_upper:
+        print("Phase 5 positive\n")
         phase_6()
         return True
     return False
 
 def phase_6():
+    print("Reached phase 6\n")
     print("All checks positive, raising the alarm\nSending GPS")
     #function_to_log gps
     #function_to_alarm_wearer + countdown clock
