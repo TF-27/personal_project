@@ -17,3 +17,8 @@
 
 ## GIT
 1. Generate a separate branch for the restructuring of fall_detection.py (and associated calculate_variables.py) AFTER finishing the full phase call tree.
+
+
+## Suggestions / Plan for app
+1. Boots suggested either Kivy or BeeWare to implement the app
+2. Implement NumPy if you're storing datalogs. Works kinda like C
