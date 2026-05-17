@@ -9,9 +9,9 @@ def calculate_Asvm(x, y, z):
     return math.sqrt(ax**2 + ay**2 + az**2)
 
 def calculate_Gsvm(x, y, z):
-    ax = x * 180 / math.pi
-    ay = y * 180 / math.pi
-    az = z * 180 / math.pi #conversions from rad/s to degrees/s
+    gx = x * 180 / math.pi
+    gy = y * 180 / math.pi
+    gz = z * 180 / math.pi #conversions from rad/s to degrees/s
 
     return math.sqrt(gx**2 + gy**2 + gz**2)
 
