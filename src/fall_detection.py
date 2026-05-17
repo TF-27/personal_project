@@ -5,6 +5,7 @@ from csv_tests import get_data
 import random #remove in final code! Is for testing at random only!
 import sys
 from fall_object import PotentialFall
+import variables
 
 
 ## NEW IDEAS:
@@ -85,9 +86,8 @@ def detect_fall():
 # Test log:
 #return f"\nTest object size: {sys.getsizeof(test_object)}\ntime: {test_object.time}\n\nasvm_list:\n{test_object.asvm_list}\n\nacc_frame:\nX\n{test_object.acc_frame['x']}\nY\n{test_object.acc_frame['y']}\nZ\n{test_object.acc_frame['z']}\n\ngyro_frame:\nX\n{test_object.gyro_frame['x']}\nY\n{test_object.gyro_frame['y']}\nZ\n{test_object.gyro_frame['z']}\n\nMean Psi: {test_object.mean_psi}"
 
-
 def phase_one(test_object):
-    if calculate_Asvm(test_object.acc_x, test_object.acc_y, test_object.acc_z) < 800: #CHANGE TO SET VARIABLE FORM LIST (MAIN BRANCH)
+    if calculate_Asvm(test_object.acc_x, test_object.acc_y, test_object.acc_z) < variables.Asvm_initial_treshold:
         return True
     return False
 
@@ -95,13 +95,13 @@ def phase_two(test_object, accelerometer_data):
     test_object.acc_frame = test_object.generate_test_frame(accelerometer_data, test_object.time, "acc")
     test_object.asvm_list = test_object.calculate_asvm_list()
     for asvm in test_object.asvm_list:
-        if asvm > 1000: #import test limit from main branch ORIGINAL IS 1400
+        if asvm > variables.Asvm_sample_treshold: #import test limit from main branch ORIGINAL IS 1400
             return True
     return False
 
 def phase_three(test_object):
     deviation_sample_acc = calculate_deviation(test_object.asvm_list[150:])
-    if deviation_sample_acc < 100:
+    if deviation_sample_acc < variables.Asvm_deviation_upper:
         return True
     return False
 
@@ -109,7 +109,7 @@ def phase_four(test_object, gyro_data):
     test_object.gyro_frame = test_object.generate_test_frame(gyro_data, test_object.time, "gyro")
     test_object.gsvm_list = test_object.calculate_gsvm_list()
     deviation_sample_gyro = calculate_deviation(test_object.gsvm_list[150:])
-    if deviation_sample_gyro < 10:
+    if deviation_sample_gyro < variables.Gsvm_deviation_upper:
         return True
     return False
 
@@ -121,7 +121,7 @@ def phase_five(test_object):
         'z': test_object.gyro_frame['z'][180:],
     }
     test_object.mean_psi = calculate_mean_psi_abs(gyro_frame_psi)
-    if test_object.mean_psi < 60:
+    if test_object.mean_psi < variables.mean_psi_upper:
         return True
     return False
 
