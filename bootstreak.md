@@ -1,3 +1,2 @@
 # What I've done to maintain my boot.dev streak today that doesn't show up in code/github
-- Generated test-data on my phone at a boulder gym
-    - Acceleromter allows g and Ax/Ay/Az. Collected both for later analyses
+- Long and difficult trial and error to get BeeWare to function on my distro. Finally got the tutorial working. Going through final steps before writting app.py for the detection project.
