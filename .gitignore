@@ -1,4 +1,18 @@
+# --- Your Existing Rules ---
 *.pyc
 *.pyo
 __pychache__/
 test_data/
+how_to_start_docker_and_beeware.md
+
+# --- Standard Python Cleanup ---
+__pycache__/
+
+# --- BeeWare / Briefcase Specific ---
+# These are essential for your new project
+build/
+dist/
+
+# --- Virtual Environments ---
+.venv/
+venv/
