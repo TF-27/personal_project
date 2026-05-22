@@ -1,11 +1,11 @@
 import numpy
 import math
-from calculate_variables import calculate_deviation, calculate_mean_psi_abs, calculate_Asvm
-from csv_tests import get_data
+from .calculate_variables import calculate_deviation, calculate_mean_psi_abs, calculate_Asvm
+from .csv_tests import get_data
 import random #remove in final code! Is for testing at random only!
 import sys
-from fall_object import PotentialFall
-import variables
+from .fall_object import PotentialFall
+from . import variables
 
 
 ## NEW IDEAS:

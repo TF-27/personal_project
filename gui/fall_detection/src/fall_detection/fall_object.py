@@ -1,4 +1,4 @@
-from calculate_variables import calculate_Asvm, calculate_Gsvm
+from .calculate_variables import calculate_Asvm, calculate_Gsvm
 #class FallFrame(timestamp):
 #    __init__(self): #check syntax!
 #    self.alarm = False
