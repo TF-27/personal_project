@@ -10,7 +10,7 @@ author = "Jeroen Alkema - van Noort"
 author_email = "contact@jeroenalkema.com"
 
 [tool.briefcase.app.fall_detection]
-formal_name = "Fall Detection"
+formal_name = "fall_detection"
 description = "6-phase fall detection with accelerometer and gyoscope [Tseng, Huang and Kau, 2025]"
 long_description = """More details about the app should go here.
 """
