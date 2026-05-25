@@ -77,10 +77,10 @@ def detect_fall():
 
             #Phase 6
             data_log.append(phase_six(test_object))
-            return data_log
+            return True
             
             print("\n###########################################\n")
-    return data_log
+    return False
 
 
 # Test log:

@@ -3,7 +3,7 @@
 """
 
 import toga
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN, ROW, CENTER
 from .fall_detection import detect_fall
 
 
@@ -16,34 +16,38 @@ class FallDetection(toga.App):
         show the main window.
         """
         self.main_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
-        self.alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
-
+        self.alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, alignment=CENTER, flex=1))
+        self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
 
         # Creating buttons
         activate_button = toga.Button(
-            "Activate App!",
+            "Run test on csv dataset",
             on_press=self.run_detect,
             margin=5
         )
 
         call_112_button = toga.Button(
             "Bel 112!",
-            on_press= self.call_112
+            on_press= self.call_112,
+            style=toga.style.Pack(background_color="red", color="black", padding=5)
         )
 
         call_ec_button = toga.Button(
             "Bel NAAM!",
-            on_press= self.call_ec
+            on_press= self.call_ec,
+            style=toga.style.Pack(background_color="orange", color="black", padding=5)
         )
 
         safe_button = toga.Button(
             "Geen hulp nodig",
-            on_press= self.safe_response
+            on_press= self.safe_response,
+            style=toga.style.Pack(background_color="green", color="black", padding=5)
         )
 
         self.alarm_box.add(call_112_button)
         self.alarm_box.add(call_ec_button)
         self.alarm_box.add(safe_button)
+        self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
 
         self.main_box.add(activate_button)
 
@@ -56,13 +60,20 @@ class FallDetection(toga.App):
     async def run_detect(self, widget):
         await self.main_window.dialog(
             toga.InfoDialog(
-                f"Running cvs testset: {detect_fall()}",
-                "Run completed",
+                "Fall Detection","Running cvs testset"
             )
         )
-        self.main_box.add(self.alarm_box) # To be moved to an actual detection later!
-        self.alarm_box.style.height = 300
-        self.main_box.refresh()
+        if detect_fall():
+            self.main_box.add(self.alarm_box) # To be moved to an actual detection later!
+            self.alarm_box.style.height = 300
+            self.main_box.refresh()
+        else:
+            await self.main_window.dialog(
+                toga.InfoDialog(
+                    "Finished detection","No fall detected"
+                )
+            )           
+#working on integration now!!!!
 
     async def call_112(self, widget):
 
