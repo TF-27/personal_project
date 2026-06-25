@@ -1,13 +1,13 @@
 # This project was generated with 0.4.2 using template: https://github.com/beeware/briefcase-template @ v0.4.2
 [tool.briefcase]
 project_name = "Fall Detection"
-bundle = "com.jeroenalkema"
+bundle = "com.dummyfortoml"
 version = "0.0.1"
-url = "https://jeroenalkema.com/fall_detection"
+url = ""
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
-author = "Jeroen Alkema - van Noort"
-author_email = "contact@jeroenalkema.com"
+author = "TF-27"
+author_email = ""
 
 [tool.briefcase.app.fall_detection]
 formal_name = "fall_detection"
