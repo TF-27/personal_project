@@ -19,8 +19,9 @@ class FallDetection(toga.App):
         self.contact_object = ContactInfo("No name given", "No number given") 
         #This will be replaced once we store the info on a file ofcourse
         self.main_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
-        self.alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, align_items=CENTER, flex=1))
-        self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
+        #self.alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, align_items=CENTER, flex=1))
+        #self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
+        #self.alarm_box.style.height = 0 # boots suggested fix to the pop-up issue
 
         # Creating buttons
         activate_button = toga.Button(
@@ -35,35 +36,18 @@ class FallDetection(toga.App):
         )
 
 
-        call_112_button = toga.Button(
-            "Bel 112!",
-            on_press= self.call_112,
-            style=toga.style.Pack(background_color="red", color="black", margin=5)
-        )
 
-        call_ec_button = toga.Button(
-            f"Message {self.contact_object.name}!",
-            on_press= self.call_ec,
-            style=toga.style.Pack(background_color="orange", color="black", margin=5)
-        )
-
-        safe_button = toga.Button(
-            "Geen hulp nodig",
-            on_press= self.safe_response,
-            style=toga.style.Pack(background_color="green", color="black", margin=5)
-        )
 #need to reset the window after the buttons are pressed!
-        self.alarm_box.add(call_112_button)
-        self.alarm_box.add(call_ec_button)
-        self.alarm_box.add(safe_button)
-        self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
+
 
         self.main_box.add(activate_button)
         self.main_box.add(settings_button)
+        #self.main_box.add(self.alarm_box)
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = self.main_box
         self.settings_window = None
+        self.alarm_window = None
         self.main_window.show()
 
 
@@ -75,9 +59,11 @@ class FallDetection(toga.App):
             )
         )
         if detect_fall():
-            self.main_box.add(self.alarm_box) # To be moved to an actual detection later!
-            self.alarm_box.style.height = 300
-            self.main_box.refresh()
+            await self.show_alarm()
+            #self.main_box.add(self.alarm_box) # Boots made me remove this for the popup issue
+            ##self.alarm_box.style.height = 300 == second solution remove
+            #self.main_box.refresh()
+            ##self.main_window.content.refresh() #boots solution to the popup issue == second solution remove
         else:
             await self.main_window.dialog(
                 toga.InfoDialog(
@@ -91,18 +77,24 @@ class FallDetection(toga.App):
         await self.main_window.dialog(
             toga.InfoDialog("Calling 112!",f"Also sending message to inform {self.contact_object.name} of the call and your GPS location")
         )
+        self.alarm_window.close()
+        self.alarm_window = None
 
     async def call_ec(self, widget):
 
         await self.main_window.dialog(
             toga.InfoDialog(f"Messaging {self.contact_object.name}!",f"GPS coordinates attached to message")
         )
+        self.alarm_window.close()
+        self.alarm_window = None
 
     async def safe_response(self, widget):
 
         await self.main_window.dialog(
-            toga.InfoDialog("I'm safe!'","No calls made or messages sent, fall detection is active"), #currently not true
+            toga.InfoDialog("I'm safe!","No calls made or messages sent, fall detection is active"), #currently not true
         )
+        self.alarm_window.close()
+        self.alarm_window = None
 
 
     def open_settings(self, widget):
@@ -127,10 +119,10 @@ class FallDetection(toga.App):
             self.name_contact = toga.TextInput(flex=1)
             self.number_contact = toga.TextInput(flex=1)
             
-            namec_box = toga.Box(direction=ROW, margin=5)
+            namec_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots corection: namec_box = toga.Box(direction=ROW, margin=5)
             namec_box.add(self.name_contact)
 
-            numberc_box = toga.Box(direction=ROW, margin=5)
+            numberc_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots correction: numberc_box = toga.Box(direction=ROW, margin=5)
             numberc_box.add(self.number_contact)
 
             contact_button = toga.Button(
@@ -166,7 +158,40 @@ class FallDetection(toga.App):
             toga.InfoDialog("Contact changed!",f"Name: {self.contact_object.name}\nNumber: {self.contact_object.number}")
         )
 
+    async def show_alarm(self):
+        if self.alarm_window is not None:
+            self.alarm_window.show()
+            return
+        
+        
+        self.alarm_window = toga.Window(title="Fall Detected!")
+        alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, align_items=CENTER))
 
+        call_112_button = toga.Button(
+            "Call 112!",
+            on_press= self.call_112,
+            style=toga.style.Pack(background_color="red", color="black", margin=5)
+        )
+
+        call_ec_button = toga.Button(
+            f"Message {self.contact_object.name}!",
+            on_press= self.call_ec,
+            style=toga.style.Pack(background_color="orange", color="black", margin=5)
+        )
+
+        safe_button = toga.Button(
+            "No help needed - I'm safe!",
+            on_press= self.safe_response,
+            style=toga.style.Pack(background_color="green", color="black", margin=5)
+        )        
+        
+        alarm_box.add(call_112_button)
+        alarm_box.add(call_ec_button)
+        alarm_box.add(safe_button)
+        alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
+        
+        self.alarm_window.content = alarm_box
+        self.alarm_window.show()
 
 def main():
     return FallDetection()
