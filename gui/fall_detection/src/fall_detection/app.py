@@ -46,8 +46,7 @@ class FallDetection(toga.App):
 
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = self.main_box
-        self.settings_window = None
-        self.alarm_window = None
+        #self.settings_window = None
         self.main_window.show()
 
 
@@ -77,76 +76,84 @@ class FallDetection(toga.App):
         await self.main_window.dialog(
             toga.InfoDialog("Calling 112!",f"Also sending message to inform {self.contact_object.name} of the call and your GPS location")
         )
-        self.alarm_window.close()
-        self.alarm_window = None
+        self.main_window.content = self.main_box
 
     async def call_ec(self, widget):
 
         await self.main_window.dialog(
             toga.InfoDialog(f"Messaging {self.contact_object.name}!",f"GPS coordinates attached to message")
         )
-        self.alarm_window.close()
-        self.alarm_window = None
+        self.main_window.content = self.main_box
 
     async def safe_response(self, widget):
 
         await self.main_window.dialog(
             toga.InfoDialog("I'm safe!","No calls made or messages sent, fall detection is active"), #currently not true
         )
-        self.alarm_window.close()
-        self.alarm_window = None
+        self.main_window.content = self.main_box
 
 
     def open_settings(self, widget):
-        if self.settings_window is None:
-            self.settings_window = toga.Window(title="Settings")
-            self.settings_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
+        #if self.settings_window is None:
+        #self.settings_window = toga.Window(title="Settings")
+        self.settings_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
 
-            namec_label = toga.Label(
-                "Contact name: ",
-                margin=(0, 5),
-            )
-            numberc_label = toga.Label(
-                "Contact number: ",
-                margin=(0, 5),
-            )
+        namec_label = toga.Label(
+            "Contact name: ",
+            margin=(0, 5),
+        )
+        numberc_label = toga.Label(
+            "Contact number: ",
+            margin=(0, 5),
+        )
 
-            self.show_info = toga.Label(
-                f"\n\nCurrent contact details:\n\nName: {self.contact_object.name}\nNumber: {self.contact_object.number}",
-                margin=(0, 5),
-            )
+        self.show_info = toga.Label(
+            f"\n\nCurrent contact details:\n\nName: {self.contact_object.name}\nNumber: {self.contact_object.number}",
+            margin=(0, 5),
+        )
 
-            self.name_contact = toga.TextInput(flex=1)
-            self.number_contact = toga.TextInput(flex=1)
-            
-            namec_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots corection: namec_box = toga.Box(direction=ROW, margin=5)
-            namec_box.add(self.name_contact)
+        self.name_contact = toga.TextInput(flex=1)
+        self.number_contact = toga.TextInput(flex=1)
+        
+        namec_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots corection: namec_box = toga.Box(direction=ROW, margin=5)
+        namec_box.add(self.name_contact)
 
-            numberc_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots correction: numberc_box = toga.Box(direction=ROW, margin=5)
-            numberc_box.add(self.number_contact)
+        numberc_box = toga.Box(style=toga.style.Pack(direction=ROW), margin=5) # before pop-up issue boots correction: numberc_box = toga.Box(direction=ROW, margin=5)
+        numberc_box.add(self.number_contact)
 
-            contact_button = toga.Button(
-                "Add contact (will overwrite existing!)",
-                on_press=self.add_contact,
-                margin=5,
-            )
+        contact_button = toga.Button(
+            "Add contact (will overwrite existing!)",
+            on_press=self.add_contact,
+            margin=5,
+        )
 
-            self.settings_box.add(namec_label)
-            self.settings_box.add(namec_box)
-            self.settings_box.add(numberc_label)
-            self.settings_box.add(numberc_box)
-            self.settings_box.add(contact_button)
-            self.settings_box.add(self.show_info)
-                 
-            self.settings_window.content = self.settings_box     
-            self.settings_window.on_close = self.cleanup_settings
-            self.settings_window.show()
-        else:
-            self.settings_window.show()
+        back_button = toga.Button(
+            "Back",
+            on_press=self.close_settings,
+            margin=5,
+        )            
 
-    def cleanup_settings(self, window):
-        self.settings_window = None
-        return True
+        self.settings_box.add(namec_label)
+        self.settings_box.add(namec_box)
+        self.settings_box.add(numberc_label)
+        self.settings_box.add(numberc_box)
+        self.settings_box.add(contact_button)
+        self.settings_box.add(self.show_info)
+        self.settings_box.add(back_button)
+                
+        #self.settings_window.content = self.settings_box     
+        #self.settings_window.on_close = self.cleanup_settings
+        #self.settings_window.show()
+        self.main_window.content = self.settings_box
+        #else:
+        #    self.settings_window.show()
+
+#    def cleanup_settings(self, window):
+#        self.settings_window = None
+#        return True
+
+    def close_settings(self, widget):
+        self.main_window.content = self.main_box
 
     async def add_contact(self, widget): #no object generated at this point. Need to add the class as well.
 
@@ -154,17 +161,12 @@ class FallDetection(toga.App):
         self.contact_object.number = self.number_contact.value
 
         self.show_info.text = f"\n\nCurrent contact details:\n\nName: {self.contact_object.name}\nNumber: {self.contact_object.number}"
-        await self.settings_window.dialog(
+        await self.main_window.dialog(
             toga.InfoDialog("Contact changed!",f"Name: {self.contact_object.name}\nNumber: {self.contact_object.number}")
         )
 
     async def show_alarm(self):
-        if self.alarm_window is not None:
-            self.alarm_window.show()
-            return
-        
-        
-        self.alarm_window = toga.Window(title="Fall Detected!")
+
         alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, align_items=CENTER))
 
         call_112_button = toga.Button(
@@ -190,8 +192,7 @@ class FallDetection(toga.App):
         alarm_box.add(safe_button)
         alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
         
-        self.alarm_window.content = alarm_box
-        self.alarm_window.show()
+        self.main_window.content = alarm_box
 
 def main():
     return FallDetection()
