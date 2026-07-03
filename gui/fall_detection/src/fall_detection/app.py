@@ -17,13 +17,9 @@ class FallDetection(toga.App):
         show the main window.
         """
         self.contact_object = ContactInfo("No name given", "No number given") 
-        #This will be replaced once we store the info on a file ofcourse
+        #This will be replaced once I store the info on a file ofcourse
         self.main_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
-        #self.alarm_box = toga.Box(style=toga.style.Pack(direction=COLUMN, align_items=CENTER, flex=1))
-        #self.alarm_box.add(toga.Box(style=toga.style.Pack(flex=1)))
-        #self.alarm_box.style.height = 0 # boots suggested fix to the pop-up issue
 
-        # Creating buttons
         activate_button = toga.Button(
             "Run test on csv dataset",
             on_press=self.run_detect,
@@ -42,11 +38,8 @@ class FallDetection(toga.App):
 
         self.main_box.add(activate_button)
         self.main_box.add(settings_button)
-        #self.main_box.add(self.alarm_box)
-
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = self.main_box
-        #self.settings_window = None
         self.main_window.show()
 
 
@@ -59,17 +52,13 @@ class FallDetection(toga.App):
         )
         if detect_fall():
             await self.show_alarm()
-            #self.main_box.add(self.alarm_box) # Boots made me remove this for the popup issue
-            ##self.alarm_box.style.height = 300 == second solution remove
-            #self.main_box.refresh()
-            ##self.main_window.content.refresh() #boots solution to the popup issue == second solution remove
         else:
             await self.main_window.dialog(
                 toga.InfoDialog(
                     "Finished detection","No fall detected"
                 )
             )           
-#working on integration now!!!!
+
 
     async def call_112(self, widget):
 
@@ -94,8 +83,6 @@ class FallDetection(toga.App):
 
 
     def open_settings(self, widget):
-        #if self.settings_window is None:
-        #self.settings_window = toga.Window(title="Settings")
         self.settings_box = toga.Box(style=toga.style.Pack(direction=COLUMN))
 
         namec_label = toga.Label(
@@ -141,16 +128,9 @@ class FallDetection(toga.App):
         self.settings_box.add(self.show_info)
         self.settings_box.add(back_button)
                 
-        #self.settings_window.content = self.settings_box     
-        #self.settings_window.on_close = self.cleanup_settings
-        #self.settings_window.show()
-        self.main_window.content = self.settings_box
-        #else:
-        #    self.settings_window.show()
 
-#    def cleanup_settings(self, window):
-#        self.settings_window = None
-#        return True
+        self.main_window.content = self.settings_box
+
 
     def close_settings(self, widget):
         self.main_window.content = self.main_box

@@ -8,15 +8,6 @@ from .fall_object import PotentialFall
 from . import variables
 
 
-## NEW IDEAS:
-# Detection is a call in main(). Calls get_gyro() and get_acc() every 1/100 s (2/200 right?). Then builds an instance of a class 'fall', which then starts collecting the 199 samples after that and storing it. 
-# That class can then have properties like which phases were checked as well-> export to store on hd for analyses.
-# Finally the class will have an alert status set to false/true. At check 6 if it's true -> raise alarm.
-
-
-#NumPy may be usefull for storing data. It works more like C! 
-#Boots suggestions for going to a phone
-
 def detect_fall():
     accelerometer_data = get_data("acc")
     gyro_data = get_data("gyro")
@@ -35,7 +26,6 @@ def detect_fall():
         else:
             print("Phase one negative")
             test_next = False
-            # not logging, too much data. Logging past phase 2
 
         while test_next:
             #Phase 2
@@ -83,8 +73,6 @@ def detect_fall():
     return False
 
 
-# Test log:
-#return f"\nTest object size: {sys.getsizeof(test_object)}\ntime: {test_object.time}\n\nasvm_list:\n{test_object.asvm_list}\n\nacc_frame:\nX\n{test_object.acc_frame['x']}\nY\n{test_object.acc_frame['y']}\nZ\n{test_object.acc_frame['z']}\n\ngyro_frame:\nX\n{test_object.gyro_frame['x']}\nY\n{test_object.gyro_frame['y']}\nZ\n{test_object.gyro_frame['z']}\n\nMean Psi: {test_object.mean_psi}"
 
 def phase_one(test_object):
     if calculate_Asvm(test_object.acc_x, test_object.acc_y, test_object.acc_z) < variables.Asvm_initial_treshold:
@@ -95,7 +83,7 @@ def phase_two(test_object, accelerometer_data):
     test_object.acc_frame = test_object.generate_test_frame(accelerometer_data, test_object.time, "acc")
     test_object.asvm_list = test_object.calculate_asvm_list()
     for asvm in test_object.asvm_list:
-        if asvm > variables.Asvm_sample_treshold: #import test limit from main branch ORIGINAL IS 1400
+        if asvm > variables.Asvm_sample_treshold:
             return True
     return False
 
@@ -128,13 +116,6 @@ def phase_five(test_object):
 def phase_six(test_object):
     print("All checks positive, raising the alarm\nSending GPS")
     return test_object.time
-    #function_to_alarm_wearer + countdown clock
-    #function to alarm emergency contact at clock == 00:00
-    #function to call emergency services if emergency contact doesn't answer?
-    #Either return to phase 1/detect fall or have main always calling phase 1/detect fall
 
-# Or do we generate an instance of a class? Containing the accelerometer and gyro data of that frame? That way we don't have to push down the data all the way!
-# Gyro frame is unclear as of yet. Will it contain all three axis, and what do we extract? If this becomes too tricky: build a class to contain the gyro data.
-# Right now your limits are hardcoded. Maybe generate a table of library containing the limits set. That way you can tweak
 
 

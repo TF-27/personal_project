@@ -1,12 +1,4 @@
 from .calculate_variables import calculate_Asvm, calculate_Gsvm
-#class FallFrame(timestamp):
-#    __init__(self): #check syntax!
-#    self.alarm = False
-#    self.acc = #collect acceleration data
-#    self.gyro = #collect gyro data
-#    self.last_phase_checked = 0
-
-#    return self
 
 class PotentialFall:
     def __init__(self, accelerometer_data, gyro_data, time):
