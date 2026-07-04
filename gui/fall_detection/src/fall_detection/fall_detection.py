@@ -15,62 +15,69 @@ def detect_fall():
     data_log = []
 
     for time in range(0,len(accelerometer_data.t)-200):
+        if time > 0:
+            print(f"Time: {test_object.time}     Last Phase: {test_object.last_phase}") #prints last phase reached in the previous round. Only seems to return phase 1, check! Know it ends on 3 a lot
         test_object = PotentialFall(accelerometer_data, gyro_data, time)
 
         #Phase 1
-        print("\n###########################################\n")
+        #print("\n###########################################\n")
         if phase_one(test_object):
-            print("Phase one positive")
+            #print("Phase one positive")
             test_object.last_phase = 1
             test_next = True
         else:
-            print("Phase one negative")
+            #print("Phase one negative")
             test_next = False
 
         while test_next:
             #Phase 2
             if phase_two(test_object, accelerometer_data): #will have to adapt when going with the live feed
-                print("Phase two positve")
+                #print("Phase two positve")
                 test_object.last_phase = 2
             else:
-                print("Phase two negative")
+                #print("Phase two negative")
                 test_next = False
                 continue
 
             #Phase 3
             if phase_three(test_object):
-                print("Phase three positive")
+                #print("Phase three positive")
                 test_object.last_phase = 3
             else:
-                print("Phase three negative")
+                #print("Phase three negative")
                 test_next = False
                 data_log.append(test_object.time)
                 continue
 
             #Phase 4
             if phase_four(test_object, gyro_data):
-                print("Phase four positive")
+                #print("Phase four positive")
                 test_object.last_phase = 4
             else:
                 test_next = False
                 data_log.append(test_object.time)
+                #print("Phase four negative")
                 continue
             
             #Phase 5
             if phase_five(test_object):
-                print("Phase five positive")
+                #print("Phase five positive")
                 test_object.last_phase = 5
             else:
                 test_next = False
                 data_log.append(test_object)
+                #print("Phase five negative")
                 continue
 
             #Phase 6
             data_log.append(phase_six(test_object))
+            #print("Executed phase 6")
             return True
             
-            print("\n###########################################\n")
+            #print("\n###########################################\n")
     return False
+
+
 
 
 
@@ -114,7 +121,8 @@ def phase_five(test_object):
     return False
 
 def phase_six(test_object):
-    print("All checks positive, raising the alarm\nSending GPS")
+    #print("All checks positive, raising the alarm\nSending GPS")
+    print(f"\nTime: {test_object.time}\n\nLast Phase:\n{test_object.last_phase}\n\nAsvm: {test_object.asvm}\n\nList Asvm:\n{test_object.asvm_list}\n\nGsvm list:\n{test_object.gsvm_list}")
     return test_object.time
 
 
