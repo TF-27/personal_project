@@ -16,3 +16,6 @@ dist/
 # --- Virtual Environments ---
 .venv/
 venv/
+
+# Test data outside GUI
+test_data
