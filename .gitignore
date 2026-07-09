@@ -19,3 +19,6 @@ venv/
 
 # Test data outside GUI
 test_data
+
+#community feedback (privacy)
+discord_suggestions.md
